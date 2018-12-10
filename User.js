@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
-mongoose.createConnection('mongodb://twitter197:Amdfx8350@ds123664.mlab.com:23664/twitter197');
+mongoose.Promise = global.Promise;
+var db = mongoose.createConnection('mongodb://twitter197:Amdfx8350@ds123664.mlab.com:23664/twitter197');
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
@@ -11,34 +12,50 @@ var userSchema = new Schema({
   favorites: [{ type: Number }],
   tweets: [{ type: Number }],
   retweets: [{ type: Number }],
-  propic: {type: Buffer, required: true, unique: false, index: false},
-  coverpic: {type: Buffer, required: true, unique: false, index: false}
+  pics: [{type: Buffer, required: false, unique: false, index: false}]
 });
 
-userSchema.statics.addUser = function (name, handle, password, propic, coverpic, callbackFunction) {
-  console.log('reached');
-  var newUser = new this({ name: name, handle: handle, password: password, followers: 0, following: [], favorites: [], tweets: [], retweets: [], propic: propic, coverpic: coverpic});
-  console.log('reached');
-  newUser.save(function(err) {
-    console.log('reached');
-    console.log(err);
-    callbackFunction(err);
+
+userSchema.statics.addUser = function (name, handle, password, pics, callbackFunction) {
+  var newUser = new this({ name: name, handle: handle, password: password, followers: 0, following: [], favorites: [], tweets: [], retweets: [], pics: pics});
+  this.findOne({handle: handle}, function (err, user) {
+      if (!user) {
+        newUser.save(callbackFunction);
+      }
+      else {
+        callbackFunction();
+      }
   });
-  // this.findOne({handle: handle}, function (err, user) {
-    //   console.log(user);
-    //   if (!user) {
-    //     newUser.save(callbackFunction);
-    //   }
-    //   else {
-    //     callbackFunction();
-    //   }
-    // });
 }
 
 userSchema.statics.getUser = function (handle, callbackFunction) {
   this.findOne({handle: handle}, function(err, user) {
     callbackFunction(user);
-});
+  });
+}
+
+userSchema.statics.getAllUsers = function (callbackFunction) {
+  this.find(function(err, users) {
+    callbackFunction(users);
+  });
+}
+
+userSchema.statics.followUser = function (handle, userHandle, callbackFunction) {
+  this.findOneAndUpdate({handle: handle}, { $addToSet: {following: userHandle} }, {
+    upsert: true,
+    returnNewDocument: true
+  }, function(err, user) {
+    callbackFunction(user);
+  });
+}
+
+userSchema.statics.addFollower = function (handle, callbackFunction) {
+  this.findOneAndUpdate({handle: handle}, { $inc: {followers: 1 } }, {
+    upsert: true,
+    returnNewDocument: true
+  }, function(err, user) {
+    callbackFunction(user);
+  });
 }
 
 userSchema.statics.addFavorite = function (handle, tweetID, callbackFunction) {
@@ -95,4 +112,4 @@ userSchema.statics.addTweet = function (handle, tweetID, callbackFunction) {
     });
   }
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = db.model('User', userSchema);

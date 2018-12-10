@@ -1,14 +1,16 @@
 var mongoose = require('mongoose');
-var connection = mongoose.createConnection('mongodb://twitter197:Amdfx8350@ds123664.mlab.com:23664/twitter197');
+mongoose.Promise = global.Promise;
+var db = mongoose.createConnection('mongodb://twitter197:Amdfx8350@ds123664.mlab.com:23664/twitter197');
 require('datejs');
-var autoIncrement = require('mongoose-auto-increment');
-autoIncrement.initialize(connection);
+// var autoIncrement = require('mongoose-auto-increment');
+// autoIncrement.initialize(db);
 
 var tweetSchema = new mongoose.Schema({
+    tweetId: {type: Number, required: true, unique: true},
 	name: {type: String, required: true, unique: false},
-	handle: {type: String, required: true},
+	handle: {type: String, required: true, unique: false},
 	text: {type: String, required: true, unique: false},
-    date: {type: Date, required: true},
+    date: {type: Date, required: true, unique: false},
     likes: {type: Number, required: true, unique: false},
     retweets: {type: Number, required: true, unique: false},
 	pic: [{type: Buffer, required: false, unique: false, index: false}],
@@ -19,28 +21,38 @@ tweetSchema.statics.getAll = function (callbackFunction) {
 }
 
 tweetSchema.statics.getAllByUser = function (handle, callbackFunction) {
-	return this.find({handle: handle}, callbackFunction);
+	return this.find({handle: handle}, function(err, tweets) {
+        callbackFunction(tweets);
+    });
 }
 
 tweetSchema.statics.getTweetByID = function (id, callbackFunction) {
-	return this.findOne({id: id}, callbackFunction);
+	return this.findOne({tweetId: id}, function(err, tweet) {
+        callbackFunction(tweet);
+      });
 }
 
 tweetSchema.statics.addTweet = function (name, handle, text, pic, callbackFunction) {
-	var today = new Date().toString();
-	var firstIndex = today.indexOf(' ');
-	var temp = today.substring(firstIndex + 1, today.indexOf('20') + 4);
-    var newTweet = new this({
-        name: name, 
-        handle: handle, 
-        text: text,
-        date: temp,
-        likes: 0,
-        retweets: 0,
-        pic: pic
+    let coll = db.collection('tweets');
+    var today = new Date()
+    coll.count().then((count) => {
+        var c = count + 1;
+        var newTweet = new this({
+            tweetId: c,
+            name: name, 
+            handle: handle, 
+            text: text,
+            date: today,
+            likes: 0,
+            retweets: 0,
+            pic: pic
+        });
+        newTweet.save(function(err) {
+            callbackFunction(err, count + 1);
+        });
     });
-    newTweet.save(callbackFunction);
+	
 }
 
-tweetSchema.plugin(autoIncrement.plugin, { model: 'Tweet', field: 'id' });
-module.exports = mongoose.model('Tweet', tweetSchema);
+//tweetSchema.plugin(autoIncrement.plugin, { model: 'Tweet', field: 'id' });
+module.exports = db.model('Tweet', tweetSchema);

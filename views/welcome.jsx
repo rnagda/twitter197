@@ -76,8 +76,8 @@ const bodyStyle = {
             <i class="fab fa-twitter" style={twitterLogo}></i>
             <div class="text1" style={joinText}>Join Twitter197 today.</div>
             <div class="text" style={buttons}> 
-              <button class="signup"><a href="/signup">Sign Up</a></button><br></br>
-              <button><a href="/login">Log In</a></button>
+            <a href="/signup"><button class="signup">Sign Up</button><br></br></a>
+              <a href="/login"><button>Log In</button></a>
             </div>
             <div class="text" style={text}>See what's happening in <br></br>the world right now</div>
             

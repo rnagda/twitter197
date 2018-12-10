@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+
+    <style>
+      body {
+        background: rgb(222, 236, 238);
+      }
+      .heading {
+        height: 45px;
+        width: 100%;
+        border-radius: 0px;
+        background-color: #43609C;
+        color: white;
+      }
+      .btn-primary {
+        background-color: rgb(73, 108, 177); 
+        padding: 2px;
+        padding-left: 7px;
+        padding-right: 7px; 
+        height: 30px; 
+        font-size: 13px; 
+        border-radius: 0px; 
+        border-color: rgb(60, 87, 141); 
+        border-width: 1px;
+        width: 28%;
+        margin-left: 30%;
+      }
+      .text {
+        position: absolute;
+        padding-top: 0px;
+        padding-left: 35px;
+        font-size: 29px;
+        font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu;
+      }
+      .textarea {
+        width: 40%;
+      }
+      .box {
+        padding-left: 30%;
+        padding-top: 0px;
+      }
+      .statusbar {
+        background: rgb(194, 195, 197);
+        width: 28%;
+        margin-left: 30%;
+        margin-top: 50px;
+        height: 30px;
+        font-family:"Trebuchet MS", Helvetica, sans-serif; 
+        font-size: 16px; 
+        font-weight: 500; 
+        padding: 4px;
+      }
+      h3 { 
+        font-family:"Trebuchet MS", Helvetica, sans-serif; 
+        font-size: 14px; 
+        font-weight: 500; 
+        float: right;
+        padding-right: 20px;
+        padding-top: 8px;
+        line-height: 30px;
+      }
+      h4 {
+        font-family:"Trebuchet MS", Helvetica, sans-serif; 
+        font-size: 14px; 
+        font-weight: 500; 
+        float: right;
+        padding-right: 180px;
+        padding-top: 8px;
+        line-height: 30px;
+      }
+      h {
+        font-size: 18px;
+        float: right;
+        padding-top: 8px;
+        padding-right: 20px;
+        color: rgb(64, 70, 160);
+      }
+      .ui-autocomplete {
+          background: white;
+          border-radius: 0px;
+          list-style: none;
+          width: 30%;
+          float:left;
+          padding-left: 5px;
+      }
+      .ui-menu .ui-menu-item a{
+          color: black;
+          height: 16px;
+          font-size: 14px;
+          width: 100%;
+      }
+      .search {
+        float: left;
+      }
+      .search input[type=text] {
+        padding: 3px;
+        margin-top: 8px;
+        margin-left: 80px;
+        width: 500px;
+        font-size: 14px;
+        border: none;
+      }
+      .search button {
+        float: right;
+        padding: 3px 10px;
+        margin-top: 8px;
+        margin-right: 16px;
+        background: rgb(230, 228, 228);
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+      }
+      .search button:hover {
+        background: #ccc;
+      }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+  </head>
+  <body>
+      <script>
+        var availableTags = JSON.parse('<%- JSON.stringify(allnames) %>');
+        $(document).ready(function() {
+          $('#form').submit(function(event) {
+            event.preventDefault();
+            if (document.getElementById("statusInput").value === "") {
+            } else {
+              $.ajax({
+                type: 'POST',
+                url: '/addstatus',
+                data: $('#form').serialize(), 
+                dataType: '',
+                success: function() {
+                  document.getElementById("statusInput").value = '';
+                }
+              });
+            }
+          });
+
+          $("#searchBar").autocomplete({
+              source: availableTags,
+              messages: {
+                noResults: '',
+                results: function() {}
+              }
+          });
+        });
+      </script>
+
+      <!-- Header with search bar + few buttons -->
+      <div class="heading">
+          <div class="text"><b>pb</b></div>
+          <div class="search">
+            <form class="form-group" action="/searchresults" method="post">
+                <input type="text" placeholder="Search" id="searchBar" name="searchBar">
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+          </div>
+          <h3><a href="/logout" style="color: white; border: none; text-decoration: none">Logout</a></h3>
+          <h4><i class="fas fa-user-friends"></i></h4>
+          <h3><i class="fas fa-globe-americas"></i></h3>
+          <h4><a href="/homepage" style="color: white; border: none; text-decoration: none">Home</a></h4>
+          <h>|</h>
+          <h3><a href=<%-  "/wall?name=" + name + "-" + lastname + '-' + id %>  style="color: white; border: none; text-decoration: none"><%= name %></a></h3>
+      </div>
+
+      <!-- Change Status Form -->
+      <div class="statusbar">
+        Hi <%= name %>!
+      </div>
+      <form id="form" action="" method="">
+        <div class="box">
+          <textarea class="textarea" id="statusInput" name="statusInput" placeholder="What's on your mind?" rows="4"></textarea>
+        </div>
+        <input type="submit" value="Update status" class="btn btn-primary">
+      </form>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

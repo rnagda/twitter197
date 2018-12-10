@@ -65,9 +65,9 @@ const bodyStyle = {
             <i class="fab fa-twitter" style={twitterLogo}></i>
             <div class="text1" style={joinText}>Sign In.</div>
             <div class="text" style={buttons}> 
-                <form action="/checklogin" method="post" class="needs-validation" novalidate>
+                <form action="/login" method="post" class="needs-validation" novalidate>
                     <div class="form-group" >
-                        <input type="text" class="form-control" name="email" id="email" placeholder="Enter handle" required></input>
+                        <input type="text" class="form-control" name="handle" id="handle" placeholder="Enter handle" required></input>
                     </div>
                     <div class="form-group" >
                         <input type="password" class="form-control" name="password" id="password" placeholder="Enter password" required></input>
