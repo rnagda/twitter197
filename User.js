@@ -77,13 +77,13 @@ userSchema.statics.removeFavorite = function (handle, tweetID, callbackFunction)
 }
 
 userSchema.statics.addTweet = function (handle, tweetID, callbackFunction) {
-    this.findOneAndUpdate({handle: handle}, { $addToSet: {tweets: tweetID} }, {
-      upsert: true,
-      returnNewDocument: true
-    }, function(err, user) {
-      callbackFunction(user);
-    });
-  }
+  this.findOneAndUpdate({handle: handle}, { $addToSet: {tweets: tweetID} }, {
+    upsert: true,
+    returnNewDocument: true
+  }, function(err, user) {
+    callbackFunction(user);
+  });
+}
   
   userSchema.statics.removeTweet = function (handle, tweetID, callbackFunction) {
     this.findOneAndUpdate({handle: handle}, { $pull: {tweets: tweetID} }, {

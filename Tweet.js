@@ -32,6 +32,24 @@ tweetSchema.statics.getTweetByID = function (id, callbackFunction) {
       });
 }
 
+tweetSchema.statics.addRetweet = function (tweetId, callbackFunction) {
+    this.findOneAndUpdate({tweetId: tweetId}, { $inc: {retweets: 1 } }, {
+        upsert: true,
+        returnNewDocument: true
+    }, function(err, user) {
+        callbackFunction();
+    });
+}
+
+tweetSchema.statics.addLike = function (tweetId, callbackFunction) {
+    this.findOneAndUpdate({tweetId: tweetId}, { $inc: {likes: 1 } }, {
+        upsert: true,
+        returnNewDocument: true
+    }, function(err, user) {
+        callbackFunction();
+    });
+}
+
 tweetSchema.statics.addTweet = function (name, handle, text, pic, callbackFunction) {
     let coll = db.collection('tweets');
     var today = new Date()

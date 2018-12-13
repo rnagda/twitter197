@@ -101,6 +101,23 @@ import Footer from './footer.jsx';
             padding-top: 3px;
             font-size: 14.5px;
             margin-left: 49px;
+            display: inline;
+          }
+          .retweetlabel {
+            font-family:"Trebuchet MS", Helvetica, sans-serif; 
+            color: black;
+            padding-top: 3px;
+            display: inline;
+            font-weight: 100px;
+            font-size: 13.5px;
+            margin-left: 330px;
+          }
+          .posthandle {
+            font-family:"Trebuchet MS", Helvetica, sans-serif; 
+            color:black;
+            padding-top: 0px;
+            font-size: 12.5px;
+            margin-left: 49px;
           }
           .box {
             padding-left: 3%;
@@ -205,6 +222,12 @@ import Footer from './footer.jsx';
           }
           .logout {
             color: white; border: none; text-decoration: none; margin-right: 5px;
+          }
+          .postimage {
+            width: 43px; height: 43px; object-fit: cover; border-radius: 50%; position: absolute; z-index: 0;
+          }
+          .poststatus {
+            padding-left: 55px; padding-top: 3px; padding-bottom: 10px;
           }
           .rts {
             color: rgb(95, 95, 95); fontSize: 13px; marginLeft: 10px; paddingTop: 5px;

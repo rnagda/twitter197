@@ -142,23 +142,28 @@ app.get('/getTweets', function (req, res) {
       var alltweets = [];
       var count = 0;
       for (var i = 0; i < user.following.length; i++) {
-        Tweet.getAllByUser(user.following[i], function(tweets) {
-          tweets.forEach(function(element) {
-            alltweets.push(element);
-          })
-        });
+        User.getUser(user.following[i], function(person) {
+          Tweet.getAllByUser(person.handle, function(tweets) {
+            tweets.forEach(function(element) {
+              element.pic[0] = "data:image/jpeg;base64," + new Buffer(person.pics[0].buffer).toString('base64');
+              alltweets.push(element);
+            })
+          });
+        })
         count++;
       }
       if (count == user.following.length) {
         Tweet.getAllByUser(req.session.handle, function(myTweets) {
           myTweets.forEach(function(el) {
+            el.pic[0] = "data:image/jpeg;base64," + new Buffer(user.pics[0].buffer).toString('base64');
             alltweets.push(el);
           })
           alltweets.sort(function(a, b){return b.tweetId - a.tweetId});
           User.getAllUsers(function(users) {
             res.json({ 
               tweets: alltweets, 
-              allusers: users
+              allusers: users,
+              curruser: user
             })
           })
         })
@@ -173,22 +178,28 @@ app.get('/getTweets', function (req, res) {
 });
 
 app.post('/retweet', function(req, res) {
+  var tweetid = req.body.tweetId;
   if (req.session.handle == null) {
     res.redirect('/');
   }
   User.addTweet(req.session.handle, tweetid, function(err) {
     User.addRetweet(req.session.handle, tweetid, function(err) {
-      res.send('success');
+      Tweet.addRetweet(tweetid, function(err) {
+        res.send('success');
+      })
     })
   })
 })
 
 app.post('/liketweet', function(req, res) {
+  var tweetid = req.body.tweetId;
   if (req.session.handle == null) {
     res.redirect('/');
   }
   User.addFavorite(req.session.handle, tweetid, function(err) {
-    res.send('success');
+    Tweet.addLike(tweetid, function(err) {
+      res.send('success');
+    })
   })
 })
 

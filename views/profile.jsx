@@ -63,7 +63,10 @@ import React from "react";
                 followButton.push(<button id="followBut" style={followBut} value={this.props.user.handle}>+ Follow</button>);
             }
         }
-
+        var label = "Your";
+        if (this.props.user.handle != this.props.currUser.handle) {
+            label = this.props.user.name + "'s";
+        }
         var tweets = [];
         var users = this.props.allUsers;
         var temp = this.props.tweets;
@@ -423,7 +426,7 @@ import React from "react";
             </div>
             <div>
                 <div class="spacer"></div>
-                <h5>Your tweets</h5>
+                <h5>{label} tweets</h5>
                 {tweets}
             </div>
           </body>

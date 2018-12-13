@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     var tweets = [];
     var users = [];
-
+    var currUser;
     // kick off getting the questions
 
     getTweets();
@@ -16,20 +16,48 @@ $(document).ready(function () {
             success: function(res) {
                 tweets = res.tweets;
                 users = res.allusers;
+                currUser = res.curruser;
                 renderPreviews();
             }
         })
     }
 
     function renderPreviews() {
-        $('#posts-here').html(
-            tweets.map((i) => '<div class="postbox" id="postbox"><div class="postnames">' + i.name + 
-            '</div><div class="poststatus">' + i.text + '</div><div class="rts">' + i.likes + ' Likes <i class="far fa-heart"></i><div class="rt2">' +
-            i.retweets + ' <i class="fas fa-retweet"></i> Retweets </div></div>  <div class="line">_______________________________________________________' +
-            '_______________________________________________</div><button class="likebut" id="likebut">' + 
-            '<i class="far fa-heart"></i> Like</button> | <button class="likebut" id="retweetbutton">' + 
-            '<i class="fas fa-retweet"></i> Retweet</button></div>').join('')
-        )
+        $('#posts-here').empty();
+        for (var i = 0; i < tweets.length; i++) {
+            if (currUser.retweets.includes(tweets[i].tweetId)) {
+                if (currUser.favorites.includes(tweets[i].tweetId)) {
+                    $('#posts-here').append('<div class="postbox" id="postbox"><img class="postimage" src="' + tweets[i].pic[0] + '"></img><div class="postnames">' + tweets[i].name + 
+                    '<div class="retweetlabel"> You retweeted </div></div><div class="posthandle">@' + tweets[i].handle + '</div><div class="poststatus">' + tweets[i].text + '</div><div class="rts">' + tweets[i].likes + ' Likes <i class="far fa-heart"></i><div class="rt2">' +
+                        tweets[i].retweets + ' <i class="fas fa-retweet"></i> Retweets </div></div>  <div class="line">_______________________________________________________' +
+                        '_________________________________________________</div><button class="likebut" value="' + tweets[i].tweetId + '" id="likedbut">' + 
+                        '<i class="fas fa-heart"></i> Liked</button> | <button class="likebut" value="' + tweets[i].tweetId + '" id="retweetedbutton">' + 
+                        '<i class="fas fa-retweet"></i> Retweeted</button></div>')
+                } else {
+                    $('#posts-here').append('<div class="postbox" id="postbox"><img class="postimage" src="' + tweets[i].pic[0] + '"><div class="postnames">' + tweets[i].name + 
+                    '<div class="retweetlabel"> You retweeted </div></div><div class="posthandle">@' + tweets[i].handle + '</div><div class="poststatus">' + tweets[i].text + '</div><div class="rts">' + tweets[i].likes + ' Likes <i class="far fa-heart"></i><div class="rt2">' +
+                    tweets[i].retweets + ' <i class="fas fa-retweet"></i> Retweets </div></div>  <div class="line">_______________________________________________________' +
+                    '_________________________________________________</div><button class="likebut" value="' + tweets[i].tweetId + '" id="likebut">' + 
+                    '<i class="far fa-heart"></i> Like</button> | <button class="likebut" value="' + tweets[i].tweetId + '" id="retweetedbutton">' + 
+                    '<i class="fas fa-retweet"></i> Retweeted</button></div>')
+                }
+            } else if (currUser.favorites.includes(tweets[i].tweetId)) {
+                $('#posts-here').append('<div class="postbox" id="postbox"><img class="postimage" src="' + tweets[i].pic[0] + '"><div class="postnames">' + tweets[i].name + 
+                    '</div><div class="posthandle">@' + tweets[i].handle + '</div><div class="poststatus">' + tweets[i].text + '</div><div class="rts">' + tweets[i].likes + ' Likes <i class="far fa-heart"></i><div class="rt2">' +
+                    tweets[i].retweets + ' <i class="fas fa-retweet"></i> Retweets </div></div>  <div class="line">_______________________________________________________' +
+                    '_________________________________________________</div><button class="likebut" value="' + tweets[i].tweetId + '" id="likedbut">' + 
+                    '<i class="fas fa-heart"></i> Liked</button> | <button class="likebut" value="' + tweets[i].tweetId + '" id="retweetbutton">' + 
+                    '<i class="fas fa-retweet"></i> Retweet</button></div>')
+            } else {
+                $('#posts-here').append('<div class="postbox" id="postbox"><img class="postimage" src="' + tweets[i].pic[0] + '"><div class="postnames">' + tweets[i].name + 
+                    '</div><div class="posthandle">@' + tweets[i].handle + '</div><div class="poststatus">' + tweets[i].text + '</div><div class="rts">' + tweets[i].likes + ' Likes <i class="far fa-heart"></i><div class="rt2">' +
+                    tweets[i].retweets + ' <i class="fas fa-retweet"></i> Retweets </div></div>  <div class="line">_______________________________________________________' +
+                    '_________________________________________________</div><button class="likebut" value="' + tweets[i].tweetId + '" id="likebut">' + 
+                    '<i class="far fa-heart"></i> Like</button> | <button class="likebut" value="' + tweets[i].tweetId + '" id="retweetbutton">' + 
+                    '<i class="fas fa-retweet"></i> Retweet</button></div>')
+            }
+        }
+        
     }
    
     $('#submit-tweet').on('click', function (event) {
@@ -48,15 +76,28 @@ $(document).ready(function () {
         }
     });
 
-    // $('#posts-here').on('click', function(event) {
-    //     $('#postbox').on('click', function(event) {
-
-    //         console.log("Hi");
-    //     })
-    // })
-
-    $('#posts-here').find("likebut").on("click", function(event) {
-        alert("His");
+    $('#posts-here').on('click', "#likebut", function(event) {
+        var tweetId = $(this).val();
+        $.ajax({
+            url: '/liketweet',
+            type: 'POST',
+            data: {tweetId: tweetId},
+            success: function() {
+                setInterval(getTweets(), 2500);
+            }
+        })
+    })
+    
+    $('#posts-here').on('click', "#retweetbutton", function(event) {
+        var tweetId = $(this).val();
+        $.ajax({
+            url: '/retweet',
+            type: 'POST',
+            data: {tweetId: tweetId},
+            success: function() {
+                setInterval(getTweets(), 2500);
+            }
+        })
     })
 
     $('#followBut').on('click', function(event) {
