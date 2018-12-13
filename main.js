@@ -7,7 +7,7 @@ $(document).ready(function () {
 
     getTweets();
     // now do it  every 2.5 seconds
-    //setInterval(getTweets, 2500);
+    setInterval(getTweets, 2500);
 
     function getTweets() {
         $.ajax({
